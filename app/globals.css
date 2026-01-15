@@ -1,12 +1,43 @@
+/* Base reset */
 * {
   box-sizing: border-box;
 }
 
+/* Root typography variables */
+:root {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Document defaults */
 html,
 body {
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #ffffff;
-  color: #111111;
+
+  font-family: var(--font-sans), system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  font-weight: 400;
+  line-height: 1.55;
+
+  background-color: #000000;
+  color: #ffffff;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Inputs inherit human font */
+textarea,
+input,
+button {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Mono only where needed */
+pre,
+code {
+  font-family: var(--font-mono), monospace;
 }
