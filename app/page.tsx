@@ -122,7 +122,8 @@ export default function Home() {
       ) : (
         <div style={{ textAlign: "center" }}>
           <p>3 free clarifications used.</p>
-          <p>Pro: Unlimited clarity — $12/month</p>
+          <p>Pro: Unlimited clarity — $9.99/month</p>
+
 
           <a
             href={`${CHECKOUT_URL}?redirect_url=https://perspicu.vercel.app/?pro=true&key=${process.env.NEXT_PUBLIC_PRO_UNLOCK_KEY}`}
