@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 
+const CHECKOUT_URL =
+  "https://perspicu.lemonsqueezy.com/checkout/buy/5067523d-5eff-4054-90ce-5963d080e43e";
+
 export default function Home() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
@@ -12,8 +15,10 @@ export default function Home() {
   const [usesLeft, setUsesLeft] = useState<number | null>(null);
   const [isPro, setIsPro] = useState(false);
 
-  // Init usage + pro status
+  // Init usage + Pro unlock
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const used = Number(localStorage.getItem("perspicu_uses") || 0);
     setUsesLeft(3 - used);
 
@@ -49,6 +54,7 @@ export default function Home() {
     } catch {
       setResult("");
     }
+
     setLoading(false);
   }
 
@@ -193,14 +199,15 @@ export default function Home() {
           <p style={{ fontSize: "0.9rem", opacity: 0.8 }}>
             Pro: Unlimited clarity + export — $12/month
           </p>
+
           <a
-            href="/api/checkout"
+            href={`${CHECKOUT_URL}?redirect_url=https://perspicu.vercel.app/?pro=true`}
             style={{
               display: "inline-block",
               marginTop: "1rem",
               padding: "0.6rem 1.2rem",
-              backgroundColor: darkMode ? "#ffffff" : "#000000",
-              color: darkMode ? "#000000" : "#ffffff",
+              backgroundColor: "#ffffff",
+              color: "#000000",
               textDecoration: "none",
               borderRadius: "4px",
               fontSize: "0.9rem",
