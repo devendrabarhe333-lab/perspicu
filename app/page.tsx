@@ -219,25 +219,30 @@ export default function Home() {
       )}
 
       {result && (
+  <div
+    style={{
+      marginTop: "2.5rem",
+      maxWidth: "700px",
+      fontSize: "1rem",
+      lineHeight: 1.7,
+      opacity: 0.95,
+    }}
+  >
+    {result
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line, i) => (
         <div
-          style={{
-            marginTop: "2.5rem",
-            maxWidth: "700px",
-            fontSize: "1rem",
-            lineHeight: 1.7,
-            opacity: 0.95,
-          }}
+          key={i}
+          className="bullet-line"
+          style={{ marginBottom: "0.35rem" }}
         >
-          {result
-            .split("\n")
-            .filter((line) => line.trim() !== "")
-            .map((line, i) => (
-              <div key={i} style={{ marginBottom: "0.35rem" }}>
-                {line}
-              </div>
-            ))}
+          {line}
         </div>
-      )}
+      ))}
+  </div>
+)}
+
 
       <p
         style={{
