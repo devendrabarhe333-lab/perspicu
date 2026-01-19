@@ -218,21 +218,21 @@ export default function Home() {
       )}
 
       {result && (
-        <div className="perspicu-output">
-          <pre
-            style={{
-              marginTop: "2.5rem",
-              maxWidth: "700px",
-              whiteSpace: "pre-wrap",
-              lineHeight: 1.7,
-              fontSize: "1rem",
-              opacity: 0.95,
-            }}
-          >
-{result}
-          </pre>
-        </div>
-      )}
+  <div
+    style={{
+      marginTop: "2.5rem",
+      maxWidth: "700px",
+      whiteSpace: "pre-line",
+      lineHeight: 1.7,
+      fontSize: "1rem",
+      opacity: 0.95,
+      wordBreak: "normal",
+    }}
+  >
+    {result}
+  </div>
+)}
+
 
       <p
         style={{
