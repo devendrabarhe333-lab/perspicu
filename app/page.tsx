@@ -15,7 +15,6 @@ export default function Home() {
   const [usesLeft, setUsesLeft] = useState<number | null>(null);
   const [isPro, setIsPro] = useState(false);
 
-  // Init usage + Pro unlock
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -84,7 +83,6 @@ export default function Home() {
         padding: "2rem",
       }}
     >
-      {/* Header */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
         <h1 style={{ fontSize: "3rem", fontWeight: 600, margin: 0 }}>
           Perspicu
@@ -220,18 +218,20 @@ export default function Home() {
       )}
 
       {result && (
-        <pre
-          style={{
-            marginTop: "2.5rem",
-            maxWidth: "700px",
-            whiteSpace: "pre-wrap",
-            lineHeight: 1.7,
-            fontSize: "1rem",
-            opacity: 0.95,
-          }}
-        >
+        <div className="perspicu-output">
+          <pre
+            style={{
+              marginTop: "2.5rem",
+              maxWidth: "700px",
+              whiteSpace: "pre-wrap",
+              lineHeight: 1.7,
+              fontSize: "1rem",
+              opacity: 0.95,
+            }}
+          >
 {result}
-        </pre>
+          </pre>
+        </div>
       )}
 
       <p
