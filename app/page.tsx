@@ -217,21 +217,27 @@ export default function Home() {
         </div>
       )}
 
-      {result && (
+     {result && (
   <div
     style={{
       marginTop: "2.5rem",
       maxWidth: "700px",
-      whiteSpace: "pre-line",
-      lineHeight: 1.7,
       fontSize: "1rem",
+      lineHeight: 1.7,
       opacity: 0.95,
-      wordBreak: "normal",
     }}
   >
-    {result}
+    {result
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line, i) => (
+        <div key={i} style={{ marginBottom: "0.35rem" }}>
+          {line}
+        </div>
+      ))}
   </div>
 )}
+
 
 
       <p
