@@ -75,12 +75,13 @@ export default function Home() {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "flex-start", // ✅ FIX
         alignItems: "center",
         fontFamily: "system-ui, sans-serif",
         backgroundColor: bgColor,
         color: textColor,
         padding: "2rem",
+        paddingTop: "3rem",
       }}
     >
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
@@ -217,28 +218,26 @@ export default function Home() {
         </div>
       )}
 
-     {result && (
-  <div
-    style={{
-      marginTop: "2.5rem",
-      maxWidth: "700px",
-      fontSize: "1rem",
-      lineHeight: 1.7,
-      opacity: 0.95,
-    }}
-  >
-    {result
-      .split("\n")
-      .filter((line) => line.trim() !== "")
-      .map((line, i) => (
-        <div key={i} style={{ marginBottom: "0.35rem" }}>
-          {line}
+      {result && (
+        <div
+          style={{
+            marginTop: "2.5rem",
+            maxWidth: "700px",
+            fontSize: "1rem",
+            lineHeight: 1.7,
+            opacity: 0.95,
+          }}
+        >
+          {result
+            .split("\n")
+            .filter((line) => line.trim() !== "")
+            .map((line, i) => (
+              <div key={i} style={{ marginBottom: "0.35rem" }}>
+                {line}
+              </div>
+            ))}
         </div>
-      ))}
-  </div>
-)}
-
-
+      )}
 
       <p
         style={{
