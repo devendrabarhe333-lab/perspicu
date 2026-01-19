@@ -75,7 +75,6 @@ export default function Home() {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start", // ✅ FIX
         alignItems: "center",
         fontFamily: "system-ui, sans-serif",
         backgroundColor: bgColor,
@@ -219,30 +218,42 @@ export default function Home() {
       )}
 
       {result && (
-  <div
-    style={{
-      marginTop: "2.5rem",
-      maxWidth: "700px",
-      fontSize: "1rem",
-      lineHeight: 1.7,
-      opacity: 0.95,
-    }}
-  >
-    {result
-      .split("\n")
-      .filter((line) => line.trim() !== "")
-      .map((line, i) => (
         <div
-          key={i}
-          className="bullet-line"
-          style={{ marginBottom: "0.35rem" }}
+          style={{
+            marginTop: "2.5rem",
+            maxWidth: "700px",
+            width: "100%",
+            fontSize: "1rem",
+            lineHeight: 1.7,
+            opacity: 0.95,
+          }}
         >
-          {line}
-        </div>
-      ))}
-  </div>
-)}
+          {result
+            .split("\n")
+            .filter((line) => line.trim() !== "")
+            .map((line, i) => {
+              const isBullet = line.trim().startsWith("•");
+              const text = isBullet ? line.replace(/^•\s*/, "") : line;
 
+              return (
+                <div
+                  key={i}
+                  className="result-line"
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    marginBottom: "0.35rem",
+                  }}
+                >
+                  {isBullet && (
+                    <span style={{ width: "1.2rem", flexShrink: 0 }}>•</span>
+                  )}
+                  <span style={{ flex: 1 }}>{text}</span>
+                </div>
+              );
+            })}
+        </div>
+      )}
 
       <p
         style={{

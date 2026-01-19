@@ -27,11 +27,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* IMPORTANT: prevents mobile font scaling issues */
+  /* Prevent mobile font scaling */
   -webkit-text-size-adjust: 100%;
 }
 
-/* Inputs inherit human font */
+/* Inputs inherit font */
 textarea,
 input,
 button {
@@ -39,13 +39,13 @@ button {
   font-size: 1rem;
 }
 
-/* Desktop: keep mono */
+/* Mono elements */
 pre,
 code {
   font-family: var(--font-mono), monospace;
 }
 
-/* ✅ MOBILE FIX ONLY */
+/* Mobile adjustment */
 @media (max-width: 768px) {
   pre {
     font-family: inherit;
@@ -55,8 +55,9 @@ code {
   }
 }
 
-/* Mobile-safe hanging indent for bullet text */
-.bullet-line {
-  padding-left: 1.2rem;
-  text-indent: -1.2rem;
+/* iOS Safari fix: stabilize flex text wrapping */
+@supports (-webkit-touch-callout: none) {
+  .result-line {
+    box-sizing: content-box;
+  }
 }
