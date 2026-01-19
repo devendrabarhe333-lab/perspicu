@@ -26,6 +26,9 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* IMPORTANT: prevents mobile font scaling issues */
+  -webkit-text-size-adjust: 100%;
 }
 
 /* Inputs inherit human font */
@@ -36,20 +39,18 @@ button {
   font-size: 1rem;
 }
 
-/* Mono only where needed */
+/* Desktop: keep mono */
 pre,
 code {
   font-family: var(--font-mono), monospace;
 }
 
-/* ===============================
-   Mobile output word-wrap fix
-   (Android + iOS)
-   =============================== */
-.perspicu-output pre {
-  white-space: pre-wrap;
-  word-break: keep-all;
-  overflow-wrap: break-word;
-  hyphens: none;
-  -webkit-hyphens: none;
+/* ✅ MOBILE FIX ONLY */
+@media (max-width: 768px) {
+  pre {
+    font-family: inherit;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: 1.6;
+  }
 }
