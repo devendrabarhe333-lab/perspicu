@@ -24,14 +24,14 @@ export async function POST(req: Request) {
       "better off dead",
     ];
 
-    if (crisisWords.some((w) => inputLower.includes(w))) {
+    if (crisisWords.some(w => inputLower.includes(w))) {
       return new Response(
-        "Perspicu is not built for crisis or mental health emergencies. Please reach out to a trusted person or professional service immediately (local emergency lines or crisis hotlines).",
+        "Perspicu is not built for crisis or mental health emergencies. Please reach out to a trusted person or professional service immediately.",
         { status: 200 }
       );
     }
 
-    // Illegal / harmful content rejection
+    // Illegal / violent rejection
     const rejectWords = [
       "kill",
       "murder",
@@ -42,13 +42,12 @@ export async function POST(req: Request) {
       "terror",
       "genocide",
       "hate speech",
-      "jihad",
       "behead",
     ];
 
-    if (rejectWords.some((w) => inputLower.includes(w))) {
+    if (rejectWords.some(w => inputLower.includes(w))) {
       return new Response(
-        "Input contains content that violates Perspicu policy (illegal, violent, or hateful material). This request cannot be processed.",
+        "Input violates content policy. Perspicu does not process illegal, violent, or hateful material.",
         { status: 403 }
       );
     }
@@ -65,42 +64,32 @@ export async function POST(req: Request) {
         {
           role: "system",
           content: `
-You are Perspicu.
+You are Perspicu: a single-pass cognitive structuring tool.
 
-PURPOSE:
-Expose existing structure in unorganized thoughts. No interpretation, no guidance.
+OUTPUT EXACTLY THREE SECTIONS ONLY.
+No introduction. No summary. No extra text.
 
-ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE):
-- Neutral, descriptive tone only
-- No advice, suggestions, or solutions
-- No second-person language
-- No emotional framing or reassurance
-- No conclusions, no recommendations
-- No verbs implying action, change, or improvement
-
-STRICTLY FORBIDDEN WORDS (OR EQUIVALENTS):
-feel, feeling, emotional, pain, heal, cope, coping, motivation, confidence,
-stress, anxiety, broken, empty, hope, fear, improve, help, guide, support,
-should, must, need, try, fix, resolve, suggest, recommend, enable
-
-OUTPUT FORMAT (EXACT — NO ADDITIONS):
+FORMAT (STRICT):
 
 WHY:
-• Present-state pattern only
-• Observable conditions or repeated structures
-• No causes framed as psychology or emotion
+Describe the present structural pattern in the input. Neutral, third-person, factual observation only.
 
 IMPACT:
-• Systemic consequence if the pattern persists
-• Effects on time, coordination, continuity, or structure
-• No judgment, no personal interpretation
+Describe systemic consequences if this structure persists. Structural or operational effects only.
 
 PATH:
-• Describe the directional tension or inherent pull already present
-• Neutral observational phrasing only
-• No steps, no action verbs, no advice
+Describe the directional tension or inherent pull already present in the situation. Observational phrasing only.
 
-If overlap occurs, reduce abstraction.
+GLOBAL CONSTRAINTS:
+- No second-person language
+- No advice, suggestions, or recommendations
+- No emotional or motivational framing
+- No coaching or therapy language
+- No questions
+- No actions, steps, or instructions
+- Analytical tone only
+
+If the input is vague, describe its vagueness structurally.
           `.trim(),
         },
         {
@@ -114,7 +103,7 @@ If overlap occurs, reduce abstraction.
 
     if (!raw.trim()) {
       return new Response(
-        "Could not generate a clear structure from this input. Try a shorter, more concrete description of the situation.",
+        "Could not generate a clear structure from this input. Try a shorter, more concrete description.",
         { status: 200 }
       );
     }
