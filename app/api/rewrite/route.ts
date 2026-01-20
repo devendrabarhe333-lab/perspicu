@@ -56,7 +56,6 @@ export async function POST(req: Request) {
     });
 
     const completion = await openai.chat.completions.create({
-      // 🔑 KEY FIX: non-mini model
       model: "gpt-4o",
       temperature: 0,
       max_tokens: 512,
@@ -75,7 +74,9 @@ IMPACT:
 Describe systemic consequences if the pattern remains unchanged. Structural outcomes only.
 
 PATH:
-Describe the directional tension or inherent pull already present. Observational only.
+Describe the directional tension or inherent pull already present.
+Use neutral observational phrasing (e.g. "tension toward X" or "pull in direction of Y").
+No steps, no action verbs, no advice.
 
 ABSOLUTE CONSTRAINTS:
 - No second-person language
@@ -95,11 +96,14 @@ ABSOLUTE CONSTRAINTS:
 
     const raw = completion.choices[0]?.message?.content ?? "";
 
+    // 🔍 Temporary debug logging
+    console.log("Raw OpenAI output:", raw);
+
     if (!raw.trim()) {
-      return new NextResponse(
-        "WHY: —\nIMPACT: —\nPATH: —",
-        { status: 200 }
-      );
+      return NextResponse.json({
+        result:
+          "Perspicu couldn't generate a clear structure from this input. Try a shorter or less emotionally charged description — the tool is designed for pure structural clarity only.",
+      });
     }
 
     return NextResponse.json({
@@ -107,7 +111,8 @@ ABSOLUTE CONSTRAINTS:
     });
   } catch {
     return NextResponse.json({
-      result: "WHY: —\nIMPACT: —\nPATH: —",
+      result:
+        "Perspicu couldn't generate a clear structure from this input. Try a shorter or less emotionally charged description — the tool is designed for pure structural clarity only.",
     });
   }
 }
