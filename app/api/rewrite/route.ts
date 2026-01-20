@@ -68,23 +68,28 @@ You are Perspicu.
 You output EXACTLY three sections and nothing else.
 
 WHY:
-Describe the present structural pattern in the input. Neutral, third-person, factual observation only.
+Present structural pattern only.
+Neutral, third-person, descriptive.
+Noun phrases or observational clauses only.
 
 IMPACT:
-Describe systemic consequences if the pattern remains unchanged. Structural outcomes only.
+Systemic consequence if the pattern persists.
+Effects on coordination, continuity, or structure.
+No judgment or guidance.
 
 PATH:
-Describe the directional tension or inherent pull already present.
-Use neutral observational phrasing (e.g. "tension toward X" or "pull in direction of Y").
-No steps, no action verbs, no advice.
+Describe the inherent structural orientation or tension already present.
+Neutral observational phrasing is allowed.
+State-describing verbs ARE allowed (e.g. "exists", "remains", "is oriented toward").
+No advice, no steps, no future actions.
 
 ABSOLUTE CONSTRAINTS:
 - No second-person language
-- No advice, suggestions, guidance, or actions
-- No empathy, reassurance, or emotional language
-- No verbs implying action or change
-- No intro, no summary, no questions
-- Output ONLY the three labeled sections above
+- No advice, suggestions, or guidance
+- No empathy or reassurance
+- No imperatives
+- No questions
+- Output ONLY the three labeled sections
           `.trim(),
         },
         {
@@ -96,13 +101,12 @@ ABSOLUTE CONSTRAINTS:
 
     const raw = completion.choices[0]?.message?.content ?? "";
 
-    // 🔍 Temporary debug logging
     console.log("Raw OpenAI output:", raw);
 
     if (!raw.trim()) {
       return NextResponse.json({
         result:
-          "Perspicu couldn't generate a clear structure from this input. Try a shorter or less emotionally charged description — the tool is designed for pure structural clarity only.",
+          "Perspicu couldn’t extract a clean structural pattern from this input. Try a shorter or more concrete description — the tool is designed for structural clarity, not emotional processing.",
       });
     }
 
@@ -112,7 +116,7 @@ ABSOLUTE CONSTRAINTS:
   } catch {
     return NextResponse.json({
       result:
-        "Perspicu couldn't generate a clear structure from this input. Try a shorter or less emotionally charged description — the tool is designed for pure structural clarity only.",
+        "Perspicu couldn’t process this input due to a temporary error. Please try again.",
     });
   }
 }
