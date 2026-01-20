@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+const MAX_INPUT_CHARS = 1200; // 🔑 critical fix
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const input = String(body?.text || "").trim();
+    let input = String(body?.text || "").trim();
 
     if (!input) {
       return NextResponse.json({ result: "" });
+    }
+
+    // 🔒 Normalize long emotional dumps (NO interpretation)
+    if (input.length > MAX_INPUT_CHARS) {
+      input = input.slice(0, MAX_INPUT_CHARS);
     }
 
     const inputLower = input.toLowerCase();
@@ -20,7 +27,6 @@ export async function POST(req: Request) {
       "self harm",
       "hurt myself",
       "want to die",
-      "no point living",
       "better off dead",
     ];
     if (crisisWords.some((w) => inputLower.includes(w))) {
@@ -32,21 +38,17 @@ export async function POST(req: Request) {
 
     // Illegal / violent rejection
     const rejectWords = [
-      "kill",
       "murder",
       "rape",
-      "porn",
       "child porn",
       "bomb",
       "terror",
       "genocide",
-      "hate speech",
-      "jihad",
       "behead",
     ];
     if (rejectWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
-        "Input violates content policy. Perspicu does not process illegal, violent, or hateful content.",
+        "Input violates content policy. Perspicu does not process illegal or violent content.",
         { status: 403 }
       );
     }
@@ -58,7 +60,7 @@ export async function POST(req: Request) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       temperature: 0,
-      max_tokens: 1024, // ✅ increased for long inputs
+      max_tokens: 700,
       messages: [
         {
           role: "system",
@@ -68,27 +70,24 @@ You are Perspicu.
 You output EXACTLY three sections and nothing else.
 
 WHY:
-Describe the present structural pattern in the input.
-Neutral, third-person, factual observation only.
+Present-state structural pattern only.
+Neutral, third-person, factual description.
 
 IMPACT:
-Describe systemic consequences if the pattern remains unchanged.
-Structural outcomes only.
+Systemic consequence if the pattern persists.
+External effects only.
 
 PATH:
-Describe the directional tension or inherent pull already present.
-Observational only.
-
-If the input is lengthy or unstructured, summarize key patterns concisely
-while preserving the three-section structure.
+Inherent structural tension or directional pull.
+Described as a state (misalignment, separation, constraint).
 
 ABSOLUTE CONSTRAINTS:
 - No second-person language
-- No advice, suggestions, guidance, or actions
-- No empathy, reassurance, or emotional language
-- No verbs implying action or change
+- No advice, guidance, or actions
+- No emotional framing
+- No verbs implying change
 - No intro, no summary, no questions
-- Output ONLY the three labeled sections above
+- Output ONLY the three labeled sections
           `.trim(),
         },
         {
@@ -99,24 +98,20 @@ ABSOLUTE CONSTRAINTS:
     });
 
     const raw = completion.choices[0]?.message?.content ?? "";
-
-    // 🔍 Temporary debug logging
     console.log("Raw OpenAI output:", raw);
 
     if (!raw.trim()) {
       return NextResponse.json({
         result:
-          "Perspicu couldn't structure this input. Try shortening it or removing emotional phrasing to expose clearer structural patterns.",
+          "Perspicu could not extract a stable structure from this input. Reducing length or emotional density reveals clearer patterns.",
       });
     }
 
-    return NextResponse.json({
-      result: raw.trim(),
-    });
+    return NextResponse.json({ result: raw.trim() });
   } catch {
     return NextResponse.json({
       result:
-        "Perspicu couldn't process this input due to a temporary error. Please try again.",
+        "Perspicu encountered a temporary processing error. Please retry.",
     });
   }
 }
