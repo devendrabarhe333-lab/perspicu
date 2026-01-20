@@ -10,6 +10,43 @@ export async function POST(req: Request) {
       return NextResponse.json({ result: "" });
     }
 
+    // --- Guardrails: crisis ---
+    const crisisKeywords = [
+      "suicide",
+      "kill myself",
+      "end my life",
+      "self harm",
+      "hurt myself",
+      "want to die",
+      "no point living",
+    ];
+
+    if (crisisKeywords.some(kw => input.toLowerCase().includes(kw))) {
+      return new Response(
+        "Perspicu is not designed for crisis situations. This appears serious — please contact a trusted person or professional service immediately (e.g., local emergency lines, suicide/crisis hotlines).",
+        { status: 200 }
+      );
+    }
+
+    // --- Guardrails: illegal / violent ---
+    const rejectKeywords = [
+      "kill",
+      "murder",
+      "bomb",
+      "terror",
+      "hate speech",
+      "genocide",
+      "rape",
+      "child porn",
+    ];
+
+    if (rejectKeywords.some(kw => input.toLowerCase().includes(kw))) {
+      return new Response(
+        "Input violates content policy. Perspicu does not process this.",
+        { status: 403 }
+      );
+    }
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY!,
     });
@@ -22,43 +59,40 @@ export async function POST(req: Request) {
         {
           role: "system",
           content: `
-You are Perspicu.
+You are Perspicu: a single-pass, zero-influence cognitive structuring tool.
 
-PURPOSE:
-Expose existing structure in unorganized thoughts. No interpretation, no guidance.
+Users provide raw, unstructured thoughts. The output must expose structure only.
 
-ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE):
-- Neutral, descriptive tone only
-- No advice, suggestions, or solutions
+OUTPUT RULES — ABSOLUTE:
+- EXACTLY three sections only
+- No intro, no summary, no empathy, no questions
+- No advice, guidance, coaching, or therapy language
 - No second-person language
-- No emotional framing or reassurance
-- No conclusions, no recommendations
-- No verbs implying action, change, or improvement
+- No verbs implying action, change, or intervention
+- Analytical, structural, neutral framing only
 
-STRICTLY FORBIDDEN WORDS (OR EQUIVALENTS):
-feel, feeling, emotional, pain, heal, cope, coping, motivation, confidence,
-stress, anxiety, broken, empty, hope, fear, improve, help, guide, support,
-should, must, need, try, fix, resolve, suggest, recommend, enable
-
-OUTPUT FORMAT (EXACT — NO ADDITIONS):
+FORMAT — NO DEVIATIONS:
 
 WHY:
-• Present-state pattern only
-• Observable conditions or repeated structures
-• No causes framed as psychology or emotion
+Describe the present pattern or underlying structure in the input.
+Third-person, neutral, factual observation only.
 
 IMPACT:
-• Systemic consequence if the pattern persists
-• Effects on time, coordination, continuity, or structure
-• No judgment, no personal interpretation
+Describe systemic consequences if the structure remains unchanged.
+Logical, structural outcomes only (coordination, alignment, continuity, risk).
 
 PATH:
-• Inherent directional tension or structural position
-• Described as a state (absence, separation, misalignment, constraint)
-• No verbs, no actions, no future steps
+Describe the inherent directional tension or structural pull already present.
+Pure observation of positioning or constraint. No steps, no actions.
 
-If overlap occurs, reduce abstraction.
-If language drifts toward advice or interpretation, regenerate internally until compliant.
+CRISIS OVERRIDE:
+If the input involves self-harm, suicide, or acute danger, do NOT analyze.
+Return only the predefined crisis message.
+
+POLICY OVERRIDE:
+If the input is illegal, hateful, or violent, return rejection text only.
+
+If extra text appears, regenerate internally until EXACT compliance.
           `.trim(),
         },
         {
