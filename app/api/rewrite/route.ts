@@ -10,8 +10,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ result: "" });
     }
 
-    // --- Guardrails: crisis ---
-    const crisisKeywords = [
+    const inputLower = input.toLowerCase();
+
+    // Crisis short-circuit
+    const crisisWords = [
       "suicide",
       "kill myself",
       "end my life",
@@ -19,30 +21,34 @@ export async function POST(req: Request) {
       "hurt myself",
       "want to die",
       "no point living",
+      "better off dead",
     ];
 
-    if (crisisKeywords.some(kw => input.toLowerCase().includes(kw))) {
+    if (crisisWords.some((w) => inputLower.includes(w))) {
       return new Response(
-        "Perspicu is not designed for crisis situations. This appears serious — please contact a trusted person or professional service immediately (e.g., local emergency lines, suicide/crisis hotlines).",
+        "Perspicu is not built for crisis or mental health emergencies. Please reach out to a trusted person or professional service immediately (local emergency lines or crisis hotlines).",
         { status: 200 }
       );
     }
 
-    // --- Guardrails: illegal / violent ---
-    const rejectKeywords = [
+    // Illegal / harmful content rejection
+    const rejectWords = [
       "kill",
       "murder",
+      "rape",
+      "porn",
+      "child porn",
       "bomb",
       "terror",
-      "hate speech",
       "genocide",
-      "rape",
-      "child porn",
+      "hate speech",
+      "jihad",
+      "behead",
     ];
 
-    if (rejectKeywords.some(kw => input.toLowerCase().includes(kw))) {
+    if (rejectWords.some((w) => inputLower.includes(w))) {
       return new Response(
-        "Input violates content policy. Perspicu does not process this.",
+        "Input contains content that violates Perspicu policy (illegal, violent, or hateful material). This request cannot be processed.",
         { status: 403 }
       );
     }
@@ -54,45 +60,47 @@ export async function POST(req: Request) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0,
-      max_tokens: 260,
+      max_tokens: 512,
       messages: [
         {
           role: "system",
           content: `
-You are Perspicu: a single-pass, zero-influence cognitive structuring tool.
+You are Perspicu.
 
-Users provide raw, unstructured thoughts. The output must expose structure only.
+PURPOSE:
+Expose existing structure in unorganized thoughts. No interpretation, no guidance.
 
-OUTPUT RULES — ABSOLUTE:
-- EXACTLY three sections only
-- No intro, no summary, no empathy, no questions
-- No advice, guidance, coaching, or therapy language
+ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE):
+- Neutral, descriptive tone only
+- No advice, suggestions, or solutions
 - No second-person language
-- No verbs implying action, change, or intervention
-- Analytical, structural, neutral framing only
+- No emotional framing or reassurance
+- No conclusions, no recommendations
+- No verbs implying action, change, or improvement
 
-FORMAT — NO DEVIATIONS:
+STRICTLY FORBIDDEN WORDS (OR EQUIVALENTS):
+feel, feeling, emotional, pain, heal, cope, coping, motivation, confidence,
+stress, anxiety, broken, empty, hope, fear, improve, help, guide, support,
+should, must, need, try, fix, resolve, suggest, recommend, enable
+
+OUTPUT FORMAT (EXACT — NO ADDITIONS):
 
 WHY:
-Describe the present pattern or underlying structure in the input.
-Third-person, neutral, factual observation only.
+• Present-state pattern only
+• Observable conditions or repeated structures
+• No causes framed as psychology or emotion
 
 IMPACT:
-Describe systemic consequences if the structure remains unchanged.
-Logical, structural outcomes only (coordination, alignment, continuity, risk).
+• Systemic consequence if the pattern persists
+• Effects on time, coordination, continuity, or structure
+• No judgment, no personal interpretation
 
 PATH:
-Describe the inherent directional tension or structural pull already present.
-Pure observation of positioning or constraint. No steps, no actions.
+• Describe the directional tension or inherent pull already present
+• Neutral observational phrasing only
+• No steps, no action verbs, no advice
 
-CRISIS OVERRIDE:
-If the input involves self-harm, suicide, or acute danger, do NOT analyze.
-Return only the predefined crisis message.
-
-POLICY OVERRIDE:
-If the input is illegal, hateful, or violent, return rejection text only.
-
-If extra text appears, regenerate internally until EXACT compliance.
+If overlap occurs, reduce abstraction.
           `.trim(),
         },
         {
@@ -103,6 +111,13 @@ If extra text appears, regenerate internally until EXACT compliance.
     });
 
     const raw = completion.choices[0]?.message?.content ?? "";
+
+    if (!raw.trim()) {
+      return new Response(
+        "Could not generate a clear structure from this input. Try a shorter, more concrete description of the situation.",
+        { status: 200 }
+      );
+    }
 
     return NextResponse.json({
       result: raw.trim(),
