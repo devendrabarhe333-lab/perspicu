@@ -23,10 +23,9 @@ export async function POST(req: Request) {
       "no point living",
       "better off dead",
     ];
-
-    if (crisisWords.some(w => inputLower.includes(w))) {
-      return new Response(
-        "Perspicu is not built for crisis or mental health emergencies. Please reach out to a trusted person or professional service immediately.",
+    if (crisisWords.some((w) => inputLower.includes(w))) {
+      return new NextResponse(
+        "Perspicu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
         { status: 200 }
       );
     }
@@ -42,12 +41,12 @@ export async function POST(req: Request) {
       "terror",
       "genocide",
       "hate speech",
+      "jihad",
       "behead",
     ];
-
-    if (rejectWords.some(w => inputLower.includes(w))) {
-      return new Response(
-        "Input violates content policy. Perspicu does not process illegal, violent, or hateful material.",
+    if (rejectWords.some((w) => inputLower.includes(w))) {
+      return new NextResponse(
+        "Input violates content policy. Perspicu does not process illegal, violent, or hateful content.",
         { status: 403 }
       );
     }
@@ -57,39 +56,34 @@ export async function POST(req: Request) {
     });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      // 🔑 KEY FIX: non-mini model
+      model: "gpt-4o",
       temperature: 0,
       max_tokens: 512,
       messages: [
         {
           role: "system",
           content: `
-You are Perspicu: a single-pass cognitive structuring tool.
+You are Perspicu.
 
-OUTPUT EXACTLY THREE SECTIONS ONLY.
-No introduction. No summary. No extra text.
-
-FORMAT (STRICT):
+You output EXACTLY three sections and nothing else.
 
 WHY:
 Describe the present structural pattern in the input. Neutral, third-person, factual observation only.
 
 IMPACT:
-Describe systemic consequences if this structure persists. Structural or operational effects only.
+Describe systemic consequences if the pattern remains unchanged. Structural outcomes only.
 
 PATH:
-Describe the directional tension or inherent pull already present in the situation. Observational phrasing only.
+Describe the directional tension or inherent pull already present. Observational only.
 
-GLOBAL CONSTRAINTS:
+ABSOLUTE CONSTRAINTS:
 - No second-person language
-- No advice, suggestions, or recommendations
-- No emotional or motivational framing
-- No coaching or therapy language
-- No questions
-- No actions, steps, or instructions
-- Analytical tone only
-
-If the input is vague, describe its vagueness structurally.
+- No advice, suggestions, guidance, or actions
+- No empathy, reassurance, or emotional language
+- No verbs implying action or change
+- No intro, no summary, no questions
+- Output ONLY the three labeled sections above
           `.trim(),
         },
         {
@@ -102,8 +96,8 @@ If the input is vague, describe its vagueness structurally.
     const raw = completion.choices[0]?.message?.content ?? "";
 
     if (!raw.trim()) {
-      return new Response(
-        "Could not generate a clear structure from this input. Try a shorter, more concrete description.",
+      return new NextResponse(
+        "WHY: —\nIMPACT: —\nPATH: —",
         { status: 200 }
       );
     }
