@@ -58,7 +58,7 @@ export async function POST(req: Request) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       temperature: 0,
-      max_tokens: 512,
+      max_tokens: 1024, // ✅ increased for long inputs
       messages: [
         {
           role: "system",
@@ -68,28 +68,27 @@ You are Perspicu.
 You output EXACTLY three sections and nothing else.
 
 WHY:
-Present structural pattern only.
-Neutral, third-person, descriptive.
-Noun phrases or observational clauses only.
+Describe the present structural pattern in the input.
+Neutral, third-person, factual observation only.
 
 IMPACT:
-Systemic consequence if the pattern persists.
-Effects on coordination, continuity, or structure.
-No judgment or guidance.
+Describe systemic consequences if the pattern remains unchanged.
+Structural outcomes only.
 
 PATH:
-Describe the inherent structural orientation or tension already present.
-Neutral observational phrasing is allowed.
-State-describing verbs ARE allowed (e.g. "exists", "remains", "is oriented toward").
-No advice, no steps, no future actions.
+Describe the directional tension or inherent pull already present.
+Observational only.
+
+If the input is lengthy or unstructured, summarize key patterns concisely
+while preserving the three-section structure.
 
 ABSOLUTE CONSTRAINTS:
 - No second-person language
-- No advice, suggestions, or guidance
-- No empathy or reassurance
-- No imperatives
-- No questions
-- Output ONLY the three labeled sections
+- No advice, suggestions, guidance, or actions
+- No empathy, reassurance, or emotional language
+- No verbs implying action or change
+- No intro, no summary, no questions
+- Output ONLY the three labeled sections above
           `.trim(),
         },
         {
@@ -101,12 +100,13 @@ ABSOLUTE CONSTRAINTS:
 
     const raw = completion.choices[0]?.message?.content ?? "";
 
+    // 🔍 Temporary debug logging
     console.log("Raw OpenAI output:", raw);
 
     if (!raw.trim()) {
       return NextResponse.json({
         result:
-          "Perspicu couldn’t extract a clean structural pattern from this input. Try a shorter or more concrete description — the tool is designed for structural clarity, not emotional processing.",
+          "Perspicu couldn't structure this input. Try shortening it or removing emotional phrasing to expose clearer structural patterns.",
       });
     }
 
@@ -116,7 +116,7 @@ ABSOLUTE CONSTRAINTS:
   } catch {
     return NextResponse.json({
       result:
-        "Perspicu couldn’t process this input due to a temporary error. Please try again.",
+        "Perspicu couldn't process this input due to a temporary error. Please try again.",
     });
   }
 }
