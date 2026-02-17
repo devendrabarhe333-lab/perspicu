@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       "want to die",
       "better off dead",
     ];
+
     if (crisisWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
         "Perspecu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
       "genocide",
       "behead",
     ];
+
     if (rejectWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
         "Input violates content policy. Perspecu does not process illegal or violent content.",
@@ -82,6 +84,10 @@ You do not:
 - Use empathy phrases
 - Use dramatic language
 - Use second-person directives
+- Use possibility language
+- Use positive framing
+- Use hypothetical language
+- Refer to future outcomes
 
 You only compress and ground.
 
@@ -92,6 +98,7 @@ Strict Rules:
 - No closing remarks.
 - No reassurance.
 - No prescriptions.
+- No interpretation in section 3.
 - End immediately after section 3.
 
 Structure exactly:
@@ -103,7 +110,7 @@ Structure exactly:
 (Identify assumptions, imagined extensions, emotional amplification.)
 
 3. What remains solid:
-(Concrete facts that remain true. No advice. No instruction.)
+(Only verifiable present facts. No projection. No possibility language. No future framing. No positive framing.)
 
 Tone:
 Calm. Minimal. Slightly sobering. Human but restrained.
@@ -121,7 +128,7 @@ Calm. Minimal. Slightly sobering. Human but restrained.
     if (!raw.trim()) {
       return NextResponse.json({
         result:
-          "Perspecu could not extract a stable compression from this input. Reducing length or emotional intensity may clarify the structure.",
+          "Perspecu could not extract a stable compression from this input.",
       });
     }
 

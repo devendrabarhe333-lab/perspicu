@@ -217,53 +217,73 @@ export default function Home() {
         </div>
       )}
 
-      {result && (
-        <div
-          style={{
-            marginTop: "2.5rem",
-            maxWidth: "700px",
-            width: "100%",
-            fontSize: "1rem",
-            lineHeight: 1.7,
-            opacity: 0.95,
-          }}
-        >
-          {result
-            .split("\n")
-            .filter((line) => line.trim() !== "")
-            .map((line, i) => {
-              const isBullet = line.trim().startsWith("•");
-              const text = isBullet ? line.replace(/^•\s*/, "") : line;
+     {result && (
+  <div
+    style={{
+      marginTop: "2.5rem",
+      maxWidth: "700px",
+      width: "100%",
+      fontSize: "1rem",
+      lineHeight: 1.7,
+      opacity: 0.95,
+    }}
+  >
+    {result
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line, i) => {
+        const trimmed = line.trim();
 
-              return (
-                <div
-                  key={i}
-                  className="result-line"
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    marginBottom: "0.35rem",
-                  }}
-                >
-                  {isBullet && (
-                    <span style={{ width: "1.2rem", flexShrink: 0 }}>•</span>
-                  )}
-                  <span style={{ flex: 1 }}>{text}</span>
-                </div>
-              );
-            })}
-        </div>
-      )}
+        const isHeader =
+          trimmed.startsWith("1.") ||
+          trimmed.startsWith("2.") ||
+          trimmed.startsWith("3.");
+
+        if (isHeader) {
+          return (
+            <div
+              key={i}
+              style={{
+                marginTop: "1.8rem",
+                marginBottom: "0.6rem",
+                paddingLeft: "0.75rem",
+                borderLeft: `3px solid ${darkMode ? "#555" : "#999"}`,
+                fontWeight: 600,
+                letterSpacing: "0.3px",
+                color: darkMode ? "#ffffff" : "#111111",
+              }}
+            >
+              {trimmed}
+            </div>
+          );
+        }
+
+        return (
+          <div
+            key={i}
+            style={{
+              marginBottom: "0.5rem",
+              paddingLeft: "1.2rem",
+              color: darkMode ? "#cccccc" : "#444444",
+            }}
+          >
+            {trimmed}
+          </div>
+        );
+      })}
+  </div>
+)}
+
 
       <p
-        style={{
-          marginTop: "2rem",
-          fontSize: "0.8rem",
-          color: darkMode ? "#888888" : "#999999",
-        }}
-      >
-        Structural clarity only.
-      </p>
-    </main>
-  );
-}
+  style={{
+    marginTop: "2.5rem",
+    fontSize: "0.75rem",
+    letterSpacing: "0.5px",
+    textTransform: "uppercase",
+    color: darkMode ? "#666666" : "#777777",
+  }}
+>
+  Cognitive distortion compression.
+</p>
+
