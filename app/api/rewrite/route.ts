@@ -12,7 +12,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ result: "" });
     }
 
-    // Normalize long input (no interpretation)
     if (input.length > MAX_INPUT_CHARS) {
       input = input.slice(0, MAX_INPUT_CHARS);
     }
@@ -29,10 +28,9 @@ export async function POST(req: Request) {
       "want to die",
       "better off dead",
     ];
-
     if (crisisWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
-        "Perspecu is not built for crisis or mental health emergencies. Please contact a trusted person or professional service immediately.",
+        "Perspecu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
         { status: 200 }
       );
     }
@@ -47,10 +45,9 @@ export async function POST(req: Request) {
       "genocide",
       "behead",
     ];
-
     if (rejectWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
-        "Input violates Perspecu policy. Illegal or violent content cannot be processed.",
+        "Input violates content policy. Perspecu does not process illegal or violent content.",
         { status: 403 }
       );
     }
@@ -60,7 +57,7 @@ export async function POST(req: Request) {
     });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",   // cost-efficient & stable for 2.0
+      model: "gpt-4o-mini",
       temperature: 0,
       max_tokens: 400,
       messages: [
@@ -69,43 +66,47 @@ export async function POST(req: Request) {
           content: `
 You are Perspecu.
 
-Perspecu compresses emotional or overextended narrative into grounded reality.
+Perspecu is a mental noise compression engine.
+
+Your function is to reduce emotional exaggeration and narrative distortion.
 
 You do not:
 - Give advice
 - Offer solutions
 - Motivate
 - Reassure
-- Empathize
 - Coach
 - Ask follow-up questions
 - Suggest actions
-- Use therapy language
-- Use "you should"
-- Use dramatic or conversational tone
+- Use therapy tone
+- Use empathy phrases
+- Use dramatic language
+- Use second-person directives
 
-Strict Output Rules:
-- Maximum 180 words
-- No summaries
-- No closing statements
-- End immediately after section 3
+You only compress and ground.
+
+Strict Rules:
+- Maximum 180 words.
+- No introduction.
+- No summary.
+- No closing remarks.
+- No reassurance.
+- No prescriptions.
+- End immediately after section 3.
 
 Structure exactly:
 
 1. What is actually happening:
-Neutral factual compression of the situation.
+(Neutral factual compression.)
 
 2. Where the mind is inflating it:
-Identify assumptions, exaggerations, or imagined outcomes without judgment.
+(Identify assumptions, imagined extensions, emotional amplification.)
 
-3. What remains stable:
-Concrete realities still true and within direct control.
+3. What remains solid:
+(Concrete facts that remain true. No advice. No instruction.)
 
 Tone:
-Calm. Grounded. Minimal. Slightly sobering. Human but restrained.
-
-Goal:
-Reduce distortion. Produce clarity through compression.
+Calm. Minimal. Slightly sobering. Human but restrained.
           `.trim(),
         },
         {
@@ -116,20 +117,19 @@ Reduce distortion. Produce clarity through compression.
     });
 
     const raw = completion.choices[0]?.message?.content ?? "";
-    console.log("Raw OpenAI output:", raw);
 
     if (!raw.trim()) {
       return NextResponse.json({
         result:
-          "Perspecu could not compress this input clearly. Reducing length or emotional density improves clarity.",
+          "Perspecu could not extract a stable compression from this input. Reducing length or emotional intensity may clarify the structure.",
       });
     }
 
     return NextResponse.json({ result: raw.trim() });
-  } catch {
+  } catch (error) {
     return NextResponse.json({
       result:
-        "Perspecu encountered a temporary processing issue. Please retry.",
+        "Perspecu encountered a temporary processing error. Please retry.",
     });
   }
 }
