@@ -117,7 +117,8 @@ export default function Home() {
       {!showPaywall ? (
         <>
           <textarea
-            placeholder="This space accepts confusion. Output removes it."
+           placeholder="Enter unfiltered thought."
+
             value={text}
             disabled={locked}
             onChange={(e) => setText(e.target.value)}
