@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const MAX_INPUT_CHARS = 1200; // 🔑 critical fix
+const MAX_INPUT_CHARS = 1200;
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ result: "" });
     }
 
-    // 🔒 Normalize long emotional dumps (NO interpretation)
+    // Normalize long input (no interpretation)
     if (input.length > MAX_INPUT_CHARS) {
       input = input.slice(0, MAX_INPUT_CHARS);
     }
@@ -29,9 +29,10 @@ export async function POST(req: Request) {
       "want to die",
       "better off dead",
     ];
+
     if (crisisWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
-        "Perspicu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
+        "Perspecu is not built for crisis or mental health emergencies. Please contact a trusted person or professional service immediately.",
         { status: 200 }
       );
     }
@@ -46,9 +47,10 @@ export async function POST(req: Request) {
       "genocide",
       "behead",
     ];
+
     if (rejectWords.some((w) => inputLower.includes(w))) {
       return new NextResponse(
-        "Input violates content policy. Perspicu does not process illegal or violent content.",
+        "Input violates Perspecu policy. Illegal or violent content cannot be processed.",
         { status: 403 }
       );
     }
@@ -58,36 +60,52 @@ export async function POST(req: Request) {
     });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",   // cost-efficient & stable for 2.0
       temperature: 0,
-      max_tokens: 700,
+      max_tokens: 400,
       messages: [
         {
           role: "system",
           content: `
-You are Perspicu.
+You are Perspecu.
 
-You output EXACTLY three sections and nothing else.
+Perspecu compresses emotional or overextended narrative into grounded reality.
 
-WHY:
-Present-state structural pattern only.
-Neutral, third-person, factual description.
+You do not:
+- Give advice
+- Offer solutions
+- Motivate
+- Reassure
+- Empathize
+- Coach
+- Ask follow-up questions
+- Suggest actions
+- Use therapy language
+- Use "you should"
+- Use dramatic or conversational tone
 
-IMPACT:
-Systemic consequence if the pattern persists.
-External effects only.
+Strict Output Rules:
+- Maximum 180 words
+- No summaries
+- No closing statements
+- End immediately after section 3
 
-PATH:
-Inherent structural tension or directional pull.
-Described as a state (misalignment, separation, constraint).
+Structure exactly:
 
-ABSOLUTE CONSTRAINTS:
-- No second-person language
-- No advice, guidance, or actions
-- No emotional framing
-- No verbs implying change
-- No intro, no summary, no questions
-- Output ONLY the three labeled sections
+1. What is actually happening:
+Neutral factual compression of the situation.
+
+2. Where the mind is inflating it:
+Identify assumptions, exaggerations, or imagined outcomes without judgment.
+
+3. What remains stable:
+Concrete realities still true and within direct control.
+
+Tone:
+Calm. Grounded. Minimal. Slightly sobering. Human but restrained.
+
+Goal:
+Reduce distortion. Produce clarity through compression.
           `.trim(),
         },
         {
@@ -103,7 +121,7 @@ ABSOLUTE CONSTRAINTS:
     if (!raw.trim()) {
       return NextResponse.json({
         result:
-          "Perspicu could not extract a stable structure from this input. Reducing length or emotional density reveals clearer patterns.",
+          "Perspecu could not compress this input clearly. Reducing length or emotional density improves clarity.",
       });
     }
 
@@ -111,7 +129,7 @@ ABSOLUTE CONSTRAINTS:
   } catch {
     return NextResponse.json({
       result:
-        "Perspicu encountered a temporary processing error. Please retry.",
+        "Perspecu encountered a temporary processing issue. Please retry.",
     });
   }
 }
