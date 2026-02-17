@@ -7,6 +7,7 @@ export default function Home() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [locked, setLocked] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   async function handleClarify() {
     if (!text.trim() || locked) return;
@@ -34,6 +35,11 @@ export default function Home() {
     setLocked(false);
   }
 
+  const bgColor = darkMode ? "#000000" : "#ffffff";
+  const textColor = darkMode ? "#f5f5f5" : "#111111";
+  const borderColor = darkMode ? "#1f1f1f" : "#dddddd";
+  const subtleText = darkMode ? "#777777" : "#666666";
+
   return (
     <main
       style={{
@@ -41,24 +47,38 @@ export default function Home() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#000000",
-        color: "#ffffff",
-        fontFamily: "Inter, system-ui, sans-serif",
+        justifyContent: "flex-start",
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+        backgroundColor: bgColor,
+        color: textColor,
         padding: "2rem",
+        paddingTop: "18vh",
       }}
     >
       {/* Brand */}
-      <h1
-        style={{
-          fontSize: "2.4rem",
-          fontWeight: 500,
-          letterSpacing: "0.5px",
-          marginBottom: "3rem",
-        }}
-      >
-        Perspecu
-      </h1>
+      <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+        <h1
+          style={{
+            fontSize: "2.8rem",
+            fontWeight: 400,
+            letterSpacing: "1px",
+            margin: 0,
+          }}
+        >
+          Perspecu
+        </h1>
+
+        <p
+          style={{
+            fontSize: "0.8rem",
+            marginTop: "0.8rem",
+            color: subtleText,
+            letterSpacing: "0.6px",
+          }}
+        >
+          Cognitive clarity engine
+        </p>
+      </div>
 
       {/* Input */}
       <textarea
@@ -68,40 +88,32 @@ export default function Home() {
         onChange={(e) => setText(e.target.value)}
         style={{
           width: "100%",
-          maxWidth: "560px",
-          height: "170px",
+          maxWidth: "520px",
+          minHeight: "160px",
           padding: "1rem",
           fontSize: "0.95rem",
           lineHeight: 1.6,
-          border: "1px solid #2a2a2a",
-          borderRadius: "2px",
+          border: `1px solid ${borderColor}`,
+          borderRadius: "0px",
           outline: "none",
-          resize: "none",
-          backgroundColor: "#0f0f0f",
-          color: "#ffffff",
+          resize: "vertical",
+          backgroundColor: darkMode ? "#0d0d0d" : "#fafafa",
+          color: textColor,
           opacity: locked ? 0.6 : 1,
         }}
       />
 
-      {/* Controls */}
-      <div
-        style={{
-          marginTop: "1.5rem",
-          display: "flex",
-          gap: "1rem",
-          alignItems: "center",
-        }}
-      >
+      {/* Buttons */}
+      <div style={{ marginTop: "1.2rem", display: "flex", gap: "1rem" }}>
         {(text || result) && (
           <button
             onClick={handleClear}
             style={{
               background: "none",
               border: "none",
-              color: "#666666",
+              color: subtleText,
               cursor: "pointer",
-              fontSize: "0.8rem",
-              letterSpacing: "0.3px",
+              fontSize: "0.85rem",
             }}
           >
             Clear
@@ -112,14 +124,14 @@ export default function Home() {
           onClick={handleClarify}
           disabled={loading || locked}
           style={{
-            padding: "0.45rem 1.1rem",
-            backgroundColor: "#111111",
-            color: "#ffffff",
-            border: "1px solid #2a2a2a",
+            padding: "0.5rem 1.2rem",
+            backgroundColor: darkMode ? "#ffffff" : "#000000",
+            color: darkMode ? "#000000" : "#ffffff",
+            border: "none",
             borderRadius: "2px",
             cursor: loading || locked ? "not-allowed" : "pointer",
             fontSize: "0.85rem",
-            letterSpacing: "0.4px",
+            opacity: loading ? 0.6 : 1,
           }}
         >
           {loading ? "Processing…" : "Clarify"}
@@ -131,10 +143,11 @@ export default function Home() {
         <div
           style={{
             marginTop: "3rem",
-            maxWidth: "560px",
+            maxWidth: "520px",
             width: "100%",
             fontSize: "0.95rem",
             lineHeight: 1.6,
+            opacity: 0.95,
           }}
         >
           {result
@@ -142,6 +155,7 @@ export default function Home() {
             .filter((line) => line.trim() !== "")
             .map((line, i) => {
               const trimmed = line.trim();
+
               const isHeader =
                 trimmed.startsWith("1.") ||
                 trimmed.startsWith("2.") ||
@@ -152,12 +166,12 @@ export default function Home() {
                   <div
                     key={i}
                     style={{
-                      marginTop: "1.6rem",
-                      marginBottom: "0.5rem",
-                      paddingLeft: "0.6rem",
-                      borderLeft: "2px solid #333333",
+                      marginTop: "2rem",
+                      marginBottom: "0.6rem",
+                      paddingLeft: "0.75rem",
+                      borderLeft: `2px solid ${borderColor}`,
                       fontWeight: 500,
-                      letterSpacing: "0.3px",
+                      letterSpacing: "0.4px",
                     }}
                   >
                     {trimmed}
@@ -171,7 +185,7 @@ export default function Home() {
                   style={{
                     marginBottom: "0.5rem",
                     paddingLeft: "1rem",
-                    color: "#cccccc",
+                    color: subtleText,
                   }}
                 >
                   {trimmed}
