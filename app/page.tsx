@@ -7,12 +7,12 @@ export default function Home() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [locked, setLocked] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
 
   async function handleClarify() {
     if (!text.trim() || locked) return;
 
     setLoading(true);
+
     try {
       const res = await fetch("/api/perspecu", {
         method: "POST",
@@ -20,12 +20,15 @@ export default function Home() {
         body: JSON.stringify({ text }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ result: "" }));
+
       setResult(data.result ?? "");
       setLocked(true);
-    } catch {
-      setResult("");
+    } catch (error) {
+      console.error("Frontend error:", error);
+      setResult("Connection error.");
     }
+
     setLoading(false);
   }
 
@@ -35,11 +38,6 @@ export default function Home() {
     setLocked(false);
   }
 
-  const bgColor = darkMode ? "#000000" : "#ffffff";
-  const textColor = darkMode ? "#f5f5f5" : "#111111";
-  const borderColor = darkMode ? "#1f1f1f" : "#dddddd";
-  const subtleText = darkMode ? "#777777" : "#666666";
-
   return (
     <main
       style={{
@@ -48,9 +46,9 @@ export default function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-        backgroundColor: bgColor,
-        color: textColor,
+        fontFamily: "system-ui, sans-serif",
+        backgroundColor: "#000000",
+        color: "#f5f5f5",
         padding: "2rem",
         paddingTop: "18vh",
       }}
@@ -72,7 +70,7 @@ export default function Home() {
           style={{
             fontSize: "0.8rem",
             marginTop: "0.8rem",
-            color: subtleText,
+            color: "#777",
             letterSpacing: "0.6px",
           }}
         >
@@ -93,12 +91,12 @@ export default function Home() {
           padding: "1rem",
           fontSize: "0.95rem",
           lineHeight: 1.6,
-          border: `1px solid ${borderColor}`,
+          border: "1px solid #1f1f1f",
           borderRadius: "0px",
           outline: "none",
           resize: "vertical",
-          backgroundColor: darkMode ? "#0d0d0d" : "#fafafa",
-          color: textColor,
+          backgroundColor: "#0d0d0d",
+          color: "#f5f5f5",
           opacity: locked ? 0.6 : 1,
         }}
       />
@@ -111,7 +109,7 @@ export default function Home() {
             style={{
               background: "none",
               border: "none",
-              color: subtleText,
+              color: "#777",
               cursor: "pointer",
               fontSize: "0.85rem",
             }}
@@ -125,8 +123,8 @@ export default function Home() {
           disabled={loading || locked}
           style={{
             padding: "0.5rem 1.2rem",
-            backgroundColor: darkMode ? "#ffffff" : "#000000",
-            color: darkMode ? "#000000" : "#ffffff",
+            backgroundColor: "#ffffff",
+            color: "#000000",
             border: "none",
             borderRadius: "2px",
             cursor: loading || locked ? "not-allowed" : "pointer",
@@ -155,7 +153,6 @@ export default function Home() {
             .filter((line) => line.trim() !== "")
             .map((line, i) => {
               const trimmed = line.trim();
-
               const isHeader =
                 trimmed.startsWith("1.") ||
                 trimmed.startsWith("2.") ||
@@ -169,7 +166,7 @@ export default function Home() {
                       marginTop: "2rem",
                       marginBottom: "0.6rem",
                       paddingLeft: "0.75rem",
-                      borderLeft: `2px solid ${borderColor}`,
+                      borderLeft: "2px solid #1f1f1f",
                       fontWeight: 500,
                       letterSpacing: "0.4px",
                     }}
@@ -185,7 +182,7 @@ export default function Home() {
                   style={{
                     marginBottom: "0.5rem",
                     paddingLeft: "1rem",
-                    color: subtleText,
+                    color: "#777",
                   }}
                 >
                   {trimmed}

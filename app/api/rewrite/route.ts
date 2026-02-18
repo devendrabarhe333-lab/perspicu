@@ -3,6 +3,10 @@ import OpenAI from "openai";
 
 const MAX_INPUT_CHARS = 1200;
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -30,10 +34,10 @@ export async function POST(req: Request) {
     ];
 
     if (crisisWords.some((w) => inputLower.includes(w))) {
-      return new NextResponse(
-        "Perspecu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
-        { status: 200 }
-      );
+      return NextResponse.json({
+        result:
+          "Perspecu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
+      });
     }
 
     // Illegal / violent rejection
@@ -48,15 +52,14 @@ export async function POST(req: Request) {
     ];
 
     if (rejectWords.some((w) => inputLower.includes(w))) {
-      return new NextResponse(
-        "Input violates content policy. Perspecu does not process illegal or violent content.",
+      return NextResponse.json(
+        {
+          result:
+            "Input violates content policy. Perspecu does not process illegal or violent content.",
+        },
         { status: 403 }
       );
     }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY!,
-    });
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -68,52 +71,38 @@ export async function POST(req: Request) {
           content: `
 You are Perspecu.
 
-Perspecu is a mental noise compression engine.
+Function:
+Compress narrative expansion into structural clarity.
 
-Your function is to reduce emotional exaggeration and narrative distortion.
+Non-negotiable rules:
 
-You do not:
-- Give advice
-- Offer solutions
-- Motivate
-- Reassure
-- Coach
-- Ask follow-up questions
-- Suggest actions
-- Use therapy tone
-- Use empathy phrases
-- Use dramatic language
-- Use second-person directives
-- Use possibility language
-- Use positive framing
-- Use hypothetical language
-- Refer to future outcomes
-
-You only compress and ground.
-
-Strict Rules:
-- Maximum 180 words.
+- Output EXACTLY three numbered sections.
 - No introduction.
 - No summary.
-- No closing remarks.
+- No closing sentence.
+- No advice.
 - No reassurance.
-- No prescriptions.
-- No interpretation in section 3.
+- No motivational tone.
+- No empathy language.
+- No second person language.
+- No future framing.
+- No hypothetical phrasing.
+- Maximum 180 words.
 - End immediately after section 3.
 
 Structure exactly:
 
-1. What is actually happening:
-(Neutral factual compression.)
+1. What is happening:
+Describe only observable elements stated in the input.
 
-2. Where the mind is inflating it:
-(Identify assumptions, imagined extensions, emotional amplification.)
+2. Where expansion occurs:
+Describe how the statement extends, generalizes, escalates, or converts a specific event into a larger conclusion.
 
-3. What remains solid:
-(Only verifiable present facts. No projection. No possibility language. No future framing. No positive framing.)
+3. What remains concrete:
+State only grounded present facts. No projection. No interpretation.
 
 Tone:
-Calm. Minimal. Slightly sobering. Human but restrained.
+Calm. Neutral. Precise. Mechanical. Slightly sobering.
           `.trim(),
         },
         {
@@ -125,18 +114,13 @@ Calm. Minimal. Slightly sobering. Human but restrained.
 
     const raw = completion.choices[0]?.message?.content ?? "";
 
-    if (!raw.trim()) {
-      return NextResponse.json({
-        result:
-          "Perspecu could not extract a stable compression from this input.",
-      });
-    }
-
-    return NextResponse.json({ result: raw.trim() });
-  } catch (error) {
     return NextResponse.json({
-      result:
-        "Perspecu encountered a temporary processing error. Please retry.",
+      result: raw.trim() || "No compression generated.",
+    });
+  } catch (error) {
+    console.error("API ERROR:", error);
+    return NextResponse.json({
+      result: "Temporary processing error. Please retry.",
     });
   }
 }
