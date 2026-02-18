@@ -14,14 +14,13 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/rewrite", {  // ✅ FIXED ENDPOINT
+      const res = await fetch("/api/rewrite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
 
       const data = await res.json().catch(() => ({ result: "" }));
-
       setResult(data.result ?? "");
       setLocked(true);
     } catch (error) {
@@ -45,19 +44,18 @@ export default function Home() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "flex-start",
         fontFamily: "system-ui, sans-serif",
-        backgroundColor: "#000000",
+        backgroundColor: "#000",
         color: "#f5f5f5",
         padding: "2rem",
         paddingTop: "18vh",
       }}
     >
       {/* Brand */}
-      <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+      <div style={{ textAlign: "center", marginBottom: "3rem" }}>
         <h1
           style={{
-            fontSize: "2.8rem",
+            fontSize: "3rem",
             fontWeight: 400,
             letterSpacing: "1px",
             margin: 0,
@@ -69,9 +67,9 @@ export default function Home() {
         <p
           style={{
             fontSize: "0.8rem",
-            marginTop: "0.8rem",
-            color: "#777",
-            letterSpacing: "0.6px",
+            marginTop: "0.9rem",
+            color: "#999",
+            letterSpacing: "0.8px",
           }}
         >
           Cognitive clarity engine
@@ -86,13 +84,12 @@ export default function Home() {
         onChange={(e) => setText(e.target.value)}
         style={{
           width: "100%",
-          maxWidth: "520px",
-          minHeight: "160px",
-          padding: "1rem",
+          maxWidth: "560px",
+          minHeight: "170px",
+          padding: "1.1rem",
           fontSize: "0.95rem",
-          lineHeight: 1.6,
-          border: "1px solid #1f1f1f",
-          borderRadius: "0px",
+          lineHeight: 1.7,
+          border: "1px solid #262626",
           outline: "none",
           resize: "vertical",
           backgroundColor: "#0d0d0d",
@@ -102,14 +99,14 @@ export default function Home() {
       />
 
       {/* Buttons */}
-      <div style={{ marginTop: "1.2rem", display: "flex", gap: "1rem" }}>
+      <div style={{ marginTop: "1.4rem", display: "flex", gap: "1rem" }}>
         {(text || result) && (
           <button
             onClick={handleClear}
             style={{
               background: "none",
               border: "none",
-              color: "#777",
+              color: "#999",
               cursor: "pointer",
               fontSize: "0.85rem",
             }}
@@ -122,14 +119,14 @@ export default function Home() {
           onClick={handleClarify}
           disabled={loading || locked}
           style={{
-            padding: "0.5rem 1.2rem",
+            padding: "0.55rem 1.3rem",
             backgroundColor: "#ffffff",
-            color: "#000000",
+            color: "#000",
             border: "none",
             borderRadius: "2px",
             cursor: loading || locked ? "not-allowed" : "pointer",
             fontSize: "0.85rem",
-            opacity: loading ? 0.6 : 1,
+            opacity: loading ? 0.7 : 1,
           }}
         >
           {loading ? "Processing…" : "Clarify"}
@@ -140,52 +137,48 @@ export default function Home() {
       {result && (
         <div
           style={{
-            marginTop: "3rem",
-            maxWidth: "520px",
+            marginTop: "3.5rem",
+            maxWidth: "560px",
             width: "100%",
-            fontSize: "0.95rem",
-            lineHeight: 1.6,
-            opacity: 0.95,
           }}
         >
           {result
-            .split("\n")
-            .filter((line) => line.trim() !== "")
-            .map((line, i) => {
-              const trimmed = line.trim();
-              const isHeader =
-                trimmed.startsWith("1.") ||
-                trimmed.startsWith("2.") ||
-                trimmed.startsWith("3.");
-
-              if (isHeader) {
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      marginTop: "2rem",
-                      marginBottom: "0.6rem",
-                      paddingLeft: "0.75rem",
-                      borderLeft: "2px solid #1f1f1f",
-                      fontWeight: 500,
-                      letterSpacing: "0.4px",
-                    }}
-                  >
-                    {trimmed}
-                  </div>
-                );
-              }
+            .split(/\n(?=\d\.\s)/)
+            .map((section, index) => {
+              const lines = section.trim().split("\n");
+              const title = lines[0];
+              const content = lines.slice(1).join(" ");
 
               return (
                 <div
-                  key={i}
+                  key={index}
                   style={{
-                    marginBottom: "0.5rem",
-                    paddingLeft: "1rem",
-                    color: "#777",
+                    marginBottom: "2.5rem",
+                    paddingLeft: "1.2rem",
+                    borderLeft: "2px solid #444",
                   }}
                 >
-                  {trimmed}
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: "1.05rem",
+                      marginBottom: "0.8rem",
+                      letterSpacing: "0.4px",
+                      color: "#ffffff",
+                    }}
+                  >
+                    {title}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: "0.95rem",
+                      lineHeight: 1.7,
+                      color: "#d6d6d6",
+                    }}
+                  >
+                    {content}
+                  </div>
                 </div>
               );
             })}
