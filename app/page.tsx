@@ -14,7 +14,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/perspecu", {
+      const res = await fetch("/api/rewrite", {  // ✅ FIXED ENDPOINT
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
