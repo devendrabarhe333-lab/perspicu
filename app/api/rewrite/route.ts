@@ -3,10 +3,6 @@ import OpenAI from "openai";
 
 const MAX_INPUT_CHARS = 1200;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -20,46 +16,9 @@ export async function POST(req: Request) {
       input = input.slice(0, MAX_INPUT_CHARS);
     }
 
-    const inputLower = input.toLowerCase();
-
-    // Crisis short-circuit
-    const crisisWords = [
-      "suicide",
-      "kill myself",
-      "end my life",
-      "self harm",
-      "hurt myself",
-      "want to die",
-      "better off dead",
-    ];
-
-    if (crisisWords.some((w) => inputLower.includes(w))) {
-      return NextResponse.json({
-        result:
-          "Perspecu is not designed for crisis situations. Please contact a trusted person or professional service immediately.",
-      });
-    }
-
-    // Illegal / violent rejection
-    const rejectWords = [
-      "murder",
-      "rape",
-      "child porn",
-      "bomb",
-      "terror",
-      "genocide",
-      "behead",
-    ];
-
-    if (rejectWords.some((w) => inputLower.includes(w))) {
-      return NextResponse.json(
-        {
-          result:
-            "Input violates content policy. Perspecu does not process illegal or violent content.",
-        },
-        { status: 403 }
-      );
-    }
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -68,7 +27,7 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-         content: `
+          content: `
 You are Perspecu.
 
 Function:
@@ -99,9 +58,9 @@ If the input contains no escalation, generalization, projection, or conclusion b
 
 No expansion detected.
 
-Do not infer.  
-Do not speculate.  
-Do not imply hidden meaning.  
+Do not infer.
+Do not speculate.
+Do not imply hidden meaning.
 Do not use words such as:
 implies, suggests, may reflect, indicates, potentially, likely.
 
@@ -120,4 +79,23 @@ State only grounded present facts from the input.
 
 Tone:
 Calm. Neutral. Precise. Mechanical. Slightly sobering.
-`.trim(),
+          `.trim(),
+        },
+        {
+          role: "user",
+          content: input,
+        },
+      ],
+    });
+
+    const raw = completion.choices[0]?.message?.content ?? "";
+
+    return NextResponse.json({ result: raw.trim() });
+  } catch (error) {
+    console.error("API error:", error);
+    return NextResponse.json(
+      { result: "Processing error." },
+      { status: 500 }
+    );
+  }
+}
