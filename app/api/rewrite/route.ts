@@ -78,4 +78,24 @@ Grounded.
 Steady.
 Human but restrained.
 `.trim(),
+        },
+        {
+          role: "user",
+          content: input,
+        },
+      ],
+    });
 
+    const raw =
+      completion.choices[0]?.message?.content?.trim() ?? "";
+
+    return NextResponse.json({ result: raw });
+
+  } catch (error) {
+    console.error("API error:", error);
+    return NextResponse.json(
+      { result: "Processing error." },
+      { status: 500 }
+    );
+  }
+}
