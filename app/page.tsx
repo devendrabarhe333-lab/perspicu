@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [locked, setLocked] = useState(false);
+  const [saved, setSaved] = useState<string[]>([]);
+
+  // Load saved structures on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("perspecu_saved");
+    if (stored) {
+      try {
+        setSaved(JSON.parse(stored));
+      } catch {
+        setSaved([]);
+      }
+    }
+  }, []);
 
   async function handleClarify() {
     if (!text.trim() || locked) return;
@@ -35,6 +48,14 @@ export default function Home() {
     setText("");
     setResult("");
     setLocked(false);
+  }
+
+  function handleSave() {
+    if (!result) return;
+
+    const updated = [result, ...saved].slice(0, 5);
+    setSaved(updated);
+    localStorage.setItem("perspecu_saved", JSON.stringify(updated));
   }
 
   return (
@@ -75,6 +96,45 @@ export default function Home() {
           Cognitive clarity engine
         </p>
       </div>
+
+      {/* Saved Structures */}
+      {saved.length > 0 && (
+        <div
+          style={{
+            maxWidth: "560px",
+            width: "100%",
+            marginBottom: "2rem",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.75rem",
+              color: "#888",
+              marginBottom: "0.8rem",
+              letterSpacing: "0.6px",
+            }}
+          >
+            Your last 5 structures
+          </div>
+
+          {saved.map((item, index) => (
+            <div
+              key={index}
+              style={{
+                marginBottom: "1rem",
+                paddingLeft: "1rem",
+                borderLeft: "2px solid #333",
+                fontSize: "0.8rem",
+                color: "#aaa",
+                lineHeight: 1.6,
+                opacity: 0.8,
+              }}
+            >
+              {item.slice(0, 160)}...
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Input */}
       <textarea
@@ -182,6 +242,23 @@ export default function Home() {
                 </div>
               );
             })}
+
+          {/* Save Button */}
+          <div style={{ marginTop: "1rem" }}>
+            <button
+              onClick={handleSave}
+              style={{
+                background: "none",
+                border: "1px solid #333",
+                padding: "0.4rem 0.9rem",
+                fontSize: "0.8rem",
+                cursor: "pointer",
+                color: "#999",
+              }}
+            >
+              Keep this
+            </button>
+          </div>
         </div>
       )}
     </main>
